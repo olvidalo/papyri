@@ -37,6 +37,45 @@ else if ($exist:path eq "/logout") then
         else <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
                 <redirect url="http://papyri.uni-koeln.de{$path}" />
              </dispatch>
+(: Unterseiten 1. Ebene :)
+else if (matches($exist:path, "^/[a-z-]+$")) then
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <forward url="{$exist:controller}/pages/{$exist:resource}.html" />
+        <view>
+            <forward url="{$exist:controller}/modules/view.xql" />
+        </view>
+        <error-handler>
+			<forward url="{$exist:controller}/error-page.html" method="get"/>
+			<forward url="{$exist:controller}/modules/view.xql"/>
+		</error-handler>
+    </dispatch>
+(: Unterseiten 2. Ebene :)
+else if (matches($exist:path, "^/[a-z-]+/[a-z-]+$")) then
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <forward url="{$exist:controller}/pages/{substring-before(substring-after($exist:path, "/"), "/")}/{$exist:resource}.html" />
+        <view>
+            <forward url="{$exist:controller}/modules/view.xql" />
+        </view>
+        <error-handler>
+			<forward url="{$exist:controller}/error-page.html" method="get"/>
+			<forward url="{$exist:controller}/modules/view.xql"/>
+		</error-handler>
+    </dispatch>
+(: Unterseiten 3. Ebene :)
+else if (matches($exist:path, "^/[a-z-]+/[a-z-]+/[a-z-]+$")) then
+    let $part1 := substring-before(substring-after($exist:path, "/"), "/")
+    let $part2 := substring-before(substring-after(substring-after($exist:path, "/"), "/"), "/")
+    return
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <forward url="{$exist:controller}/pages/{$part1}/{$part2}/{$exist:resource}.html" />
+        <view>
+            <forward url="{$exist:controller}/modules/view.xql" />
+        </view>
+        <error-handler>
+			<forward url="{$exist:controller}/error-page.html" method="get"/>
+			<forward url="{$exist:controller}/modules/view.xql"/>
+		</error-handler>
+    </dispatch>
 else if (ends-with($exist:resource, ".html")) then
     (: the html page is run through view.xql to expand templates :)
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
