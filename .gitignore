@@ -1,1 +1,4 @@
+data/*
 modules/admin.xqm
+*.properties
+*.xpr
