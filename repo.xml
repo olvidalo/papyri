@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta xmlns="http://exist-db.org/xquery/repo">
+    <description>Papyri</description>
+    <author/>
+    <website/>
+    <status>alpha</status>
+    <license>GNU-LGPL</license>
+    <copyright>true</copyright>
+    <type>application</type>
+    <target>papyri</target>
+    <prepare>pre-install.xql</prepare>
+    <finish/>
+    <deployed>2014-11-27T14:16:03.291+01:00</deployed>
+</meta>
