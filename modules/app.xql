@@ -6,6 +6,7 @@ import module namespace templates="http://exist-db.org/xquery/templates" ;
 import module namespace config="http://papyri.uni-koeln.de:8080/papyri/config" at "config.xqm";
 import module namespace auth="http://papyri.uni-koeln.de:8080/papyri/auth" at "auth.xqm";
 import module namespace error="http://papyri.uni-koeln.de:8080/papyri/error" at "error.xqm";
+import module namespace helpers="http://papyri.uni-koeln.de:8080/papyri/helpers" at "helpers.xqm";
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
@@ -31,28 +32,42 @@ declare function app:menu($node as node(), $model as map(*)){
             <ul class="nav navbar-nav">
              <!-- class="active" -->
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sammlung <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Objekte <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/pages/sammlung_inventarnummer.html">Nach Inventarnummer</a></li>
-                        <li><a href="/pages/sammlung_datierung.html">Nach Datierung</a></li>
-                        <li><a href="/pages/sammlung_herkunft.html">Nach Herkunft</a></li>
-                        <li><a href="/pages/sammlung_material.html">Nach Material</a></li>
+                        <li><a href="{$helpers:app-root}/objekte/uebersicht">Übersicht</a></li>
+                        <li><a href="{$helpers:app-root}/objekte/inventarnummer">nach Inventarnummer</a></li>
+                        <li><a href="{$helpers:app-root}/objekte/datierung">nach Datierung</a></li>
+                        <li><a href="{$helpers:app-root}/objekte/herkunft">nach Herkunft</a></li>
+                        <li><a href="{$helpers:app-root}/objekte/material">nach Material</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Texte <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">Publikationen</a></li>
-                        <li><a href="/pages/stuecke.html">Die wichtigsten Stücke</a></li>
-                        <li><a href="#">Nach Titel</a></li>
-                        <li><a href="#">Nach Textsorte</a></li>
-                        <li><a href="#">Nach Datierung</a></li>
-                        <li><a href="#">Nach Herkunft</a></li>
+                        <li class="dropdown-submenu" >
+                            <a href="#">Editionen</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{$helpers:app-root}/texte/editionen/nach-baenden">nach Bänden</a></li>
+                                <li><a href="{$helpers:app-root}/texte/editionen/nach-titeln">nach Titeln</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{$helpers:app-root}/texte/prominente-stuecke">Prominente Stücke</a></li>
+                        <li><a href="{$helpers:app-root}/texte/uebersicht">Übersicht</a></li>
+                        <li><a href="{$helpers:app-root}/texte/titel">nach Titel</a></li>
+                        <li><a href="{$helpers:app-root}/texte/textsorte">nach Textsorte</a></li>
+                        <li><a href="{$helpers:app-root}/texte/datierung">nach Datierung</a></li>
+                        <li><a href="{$helpers:app-root}/texte/sprache">nach Sprache</a></li>
+                        <li><a href="{$helpers:app-root}/texte/schrift">nach Schrift</a></li>
                     </ul>
                 </li>
-                <li>{if ($resource = "bibliographie.html") then attribute class {"active"} else ()}<a href="/pages/bibliographie.html">Bibliographie</a></li>
-                <li><a href="#">Recherche</a></li>
-                <li>{if ($resource = "about.html") then attribute class {"active"} else ()}<a href="/pages/about.html">About</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Recherche <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                       <li><a href="{$helpers:app-root}/recherche/komplexe-suche">komplexe Suche</a></li>
+                       <li><a href="{$helpers:app-root}/recherche/bibliographie">Bibliographie</a></li>
+                    </ul>
+                </li>
+                <li>{if ($resource = "about.html") then attribute class {"active"} else ()}<a href="about">About</a></li>
              </ul>
         </nav>
 };
