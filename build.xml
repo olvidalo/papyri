@@ -24,6 +24,7 @@
                 <exclude name="**/*.md"/>
                 <exclude name="**/.gitignore"/>
                 <exclude name="*.xpr"/>
+                <exclude name="data/**/*" />
             </fileset>
         </xdb:store>
     </target>
@@ -45,6 +46,7 @@
                 <exclude name="**/*.md"/>
                 <exclude name="**/.gitignore"/>
                 <exclude name="*.xpr"/>
+                <exclude name="data/**/*" />
             </fileset>
         </xdb:store>
         <xdb:xquery uri="${uri}" queryfile="post-install.xql" user="${user}" password="${password}"/>
