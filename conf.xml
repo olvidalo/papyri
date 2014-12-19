@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app-conf>
+    <!-- Webapp-Root: darauf beziehen sich z.B. CSS und JS-Dateien, die eingebunden werden
+    http://papyri.uni-koeln.de:8080/apps/papyri -->
+    <webapp-root>http://papyri.uni-koeln.de:8080/apps/papyri</webapp-root>
+    <!-- File-Path: Pfad im Dateisystem, unter dem z.B. Bilddateien zu finden sind
+    /var/local/papyri/z_images -->
+    <file-path>/var/local/papyri/z_images</file-path>
+    <!-- Request-Path: Teil der request uri, der hinausgeworfen und durch die webapp-root ersetzt wird
+    /apps/papyri -->
+    <request-path>/apps/papyri</request-path>
+    <!-- Webfile-Path: wie sind DB-externe Dateien, z.B. Bilddateien, übers Web zu erreichen?
+    http://papyri.uni-koeln.de/z_images -->
+    <webfile-path>http://papyri.uni-koeln.de/z_images</webfile-path>
+</app-conf>
