@@ -5,6 +5,7 @@ xquery version "3.0";
  : within a module.
  :)
 module namespace config="http://papyri.uni-koeln.de:8080/papyri/config";
+import module namespace admin="http://papyri.uni-koeln.de:8080/exist/apps/papyri/admin" at "admin.xqm";
 
 declare namespace templates="http://exist-db.org/xquery/templates";
 
@@ -14,8 +15,8 @@ declare namespace expath="http://expath.org/ns/pkg";
 (:  Admin Login
     um bestimmte Operationen mit
     Admin-Rechten ausführen zu können :)
-declare variable $config:admin-id as xs:string := "admin";
-declare variable $config:admin-pass as xs:string := "mANIkuere753";
+declare variable $config:admin-id as xs:string := $admin:admin-id;
+declare variable $config:admin-pass as xs:string := $admin:admin-pass;
 (: Pfade :)
 declare variable $config:conf-file := doc("/db/apps/papyri/conf.xml");
 declare variable $config:webapp-root := $config:conf-file//webapp-root/data(.);
