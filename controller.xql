@@ -1,13 +1,14 @@
 xquery version "3.0";
 
 import module namespace auth="http://papyri.uni-koeln.de:8080/papyri/auth" at "modules/auth.xqm";
+import module namespace config="http://papyri.uni-koeln.de:8080/papyri/config" at "modules/config.xqm";
 
 declare variable $exist:path external;
 declare variable $exist:resource external;
 declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
-declare variable $exist:app := "http://papyri.uni-koeln.de/";
+declare variable $exist:app := concat($config:webapp-root,'/');
 
 if ($exist:path eq "/" or $exist:path eq "") then
     (: forward root path to index.xql :)
