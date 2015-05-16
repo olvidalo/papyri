@@ -95,7 +95,7 @@ declare function app:login($node as node(), $model as map(*)){
          else <span onclick="document.getElementById('LoginForm').style.display='block';">Login</span>
          }
         <div id="LoginForm" style="display: {if ($error = "login") then "block;" else "none;"}">
-            <span class="close" onclick="document.getElementById('LoginForm').style.display='none';"><img src="/resources/icons/dialog_close.png" alt="Schließen" /></span>
+            <span class="close" onclick="document.getElementById('LoginForm').style.display='none';"><img src="{$helpers:app-root}/resources/icons/dialog_close.png" alt="Schließen" /></span>
             <form method="POST" action="/login">
                {if ($error = "login") 
                then (app:print-error($node, $model, $error), session:remove-attribute("error"))
