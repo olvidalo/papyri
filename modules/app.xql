@@ -67,7 +67,7 @@ declare function app:menu($node as node(), $model as map(*)){
                        <li><a href="{$helpers:app-root}/recherche/bibliographie">Bibliographie</a></li>
                     </ul>
                 </li>
-                <li>{if ($resource = "about.html") then attribute class {"active"} else ()}<a href="about">About</a></li>
+                <li>{if ($resource = "about.html") then attribute class {"active"} else ()}<a href="{$helpers:app-root}/about">About</a></li>
              </ul>
         </nav>
 };
