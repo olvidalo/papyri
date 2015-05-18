@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <div xmlns="http://www.w3.org/1999/xhtml" class="templates:surround?with=templates/content.html&amp;at=contentMain">
     <div class="page-header">
         <h1>Komplexe Suche</h1>
@@ -7,5 +6,65 @@
         <!--<div class="app:list-items?type=datierung span12">
             Stückliste
         </div>-->
+        <div>
+            <h3>Inventarnummer:</h3>
+            <select name="Inventarnummer">
+                <option>00002</option>
+                <option>00003</option>
+                <option>00006</option>
+                <option>00008</option>
+                <option>...</option>
+            </select>
+        </div>
+        <h2>Textträger</h2>
+        <div>
+            <h3>Herkunftsort:</h3>
+            <select name="Herkunftsort">
+                <option>Memphites</option>
+                <option>Oxyrhynchos</option>
+                <option>...</option>
+            </select>
+        </div>
+        <div>
+            <h3>Material</h3>
+            <select name="Material">
+                <option>Papyrus</option>
+                <option>Pergament</option>
+                <option>Papier</option>
+                <option>Leinen</option>
+                <option>Leder</option>
+                <option>Sonstiges</option>
+            </select>
+        </div>
+        <h2>Texte</h2>
+        <div>
+            <h3>Textart:</h3>
+            <label for="dokumentarisch">dokumentarisch</label>
+            <input type="radio" id="dokumentarisch" name="Textart" value="dokumentarisch"></input>
+            <br />
+            <label for="literarisch">literarisch</label>
+            <input type="radio" id="literarisch" name="Textart" value="literarisch"></input>
+            <br />
+            <label for="paraliterarisch">in Bearbeitung</label>
+            <input type="radio" id="paraliterarisch" name="Textart" value="paraliterarisch"></input>
+            <label for="unbekannt">unbekannt</label>
+            <input type="radio" id="unbekannt" name="Textart" value="unbekannt"></input>
+        </div>
+        <div>
+            <h3>Publikationsstatus:</h3>
+            <label for="publiziert">publiziert</label>
+            <input type="radio" id="publiziert" name="Publikationsstatus" value="publiziert"></input>
+            <br />
+            <label for="unpubliziert">unpubliziert</label>
+            <input type="radio" id="unpubliziert" name="Publikationsstatus" value="unpubliziert"></input>
+            <br />
+            <label for="inBearbeitung">in Bearbeitung</label>
+            <input type="radio" id="inBearbeitung" name="Publikationsstatus" value="in Bearbeitung"></input>
+        </div>
+        <div>
+            <h3>Volltextsuche:</h3> 
+            <input type="text" name="Volltextsuche"></input>
+        </div>
+        <input type="submit" name="Submit" value="Los!"></input>
     </div>
 </div>
