@@ -6,5 +6,5 @@ declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare variable $search:data-path := "/db/apps/papyri/data/stuecke";
 
 declare function search:get-inv($node as node(), $model as map(*)){
-    
+    <div></div>
 };
