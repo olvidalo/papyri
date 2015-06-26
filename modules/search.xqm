@@ -89,7 +89,7 @@ declare function search:resolve($base as node()*, $constraints as map()*) {
                                     $results
                                  else 
                                     for $resultID in distinct-values($results//@xml:id[1])
-                                        return $results//@xml:id[. = $resultID]/..
+                                        return $results/id($resultID)
 
 		return search:resolve($distinctResults, subsequence($constraints, 2))
 	   
