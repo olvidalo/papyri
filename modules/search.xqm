@@ -201,12 +201,25 @@ declare variable $search:fields := map {
     "sprache" := map {
     	$search:kFieldTitle := "Sprache",
         $search:kFieldRef := $search:cText,
-        $search:kFieldOperators := ("eq", "cont"),
-    	$search:kFieldInput := <input type="text"></input>,
+        $search:kFieldOperators := ("eq"),
+    	$search:kFieldInput := <select></select>,
     	$search:kFieldResolve := function($item as node(), $op as xs:string?, $term as xs:string) {
-			        	 switch($op) 
-                            case 'cont' return $item//tei:msItemStruct/tei:textLang/tei:note[@type="language" and contains(lower-case(.), lower-case($term))]
-                            default  return $item//tei:msItemStruct/tei:textLang/tei:note[@type="language" and lower-case(.) = lower-case($term)]
+			        	 $item//tei:msItemStruct/tei:textLang/tei:note[@type="language" and tei:term = $term]
+        },
+        $search:kFieldValues := function() {
+            distinct-values(xmldb:xcollection($search:data-path)//tei:msItemStruct/tei:textLang/tei:note[@type="language"]/tei:term)
+        }
+    },
+    "schrift" := map {
+        $search:kFieldTitle := "Schrift",
+        $search:kFieldRef := $search:cText,
+        $search:kFieldOperators := ("eq"),
+        $search:kFieldInput := <select></select>,
+        $search:kFieldResolve := function($item as node(), $op as xs:string?, $term as xs:string) {
+                         $item//tei:msItemStruct/tei:textLang/tei:note[@type="script" and tei:term = $term]
+        },
+        $search:kFieldValues := function() {
+            distinct-values(xmldb:xcollection($search:data-path)//tei:msItemStruct/tei:textLang/tei:note[@type="script"]/tei:term)
         }
     },
     (: Suche in allen Elementen :)
