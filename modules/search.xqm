@@ -224,12 +224,12 @@ declare variable $search:fields := map {
     },
     (: Suche in allen Elementen :)
     "volltext" := map {
-        $search:kFieldTitle := "Volltext",
+        $search:kFieldTitle := "Beliebiges Feld",
         $search:kFieldRef := $search:cText,
         $search:kFieldOperators := ("cont"),
         $search:kFieldInput := <input type="text"></input>,
         $search:kFieldResolve := function($item as node(), $op as xs:string?, $term as xs:string) {
-            $item//tei:msItemStruct/tei:textLang/tei:note[@type="language" and contains(lower-case(.), lower-case($term))]
+            $item//*[contains(lower-case(@*/text()), lower-case($term)) or contains(lower-case(text()), lower-case($term))]
         }
     },
     (: Suche nach Datierung :)
