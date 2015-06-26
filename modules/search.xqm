@@ -88,8 +88,8 @@ declare function search:resolve($base as node()*, $constraints as map()*) {
         let $distinctResults := if (count($constraint("searchTerm")) = 1) then 
                                     $results
                                  else 
-                                    for $resultID in distinct-values($results/*[1]/@xml:id)
-                                        return $results[*/@xml:id = $resultID]
+                                    for $resultID in distinct-values($results//@xml:id[1])
+                                        return $results//@xml:id[. = $resultID]/..
 
 		return search:resolve($distinctResults, subsequence($constraints, 2))
 	   
