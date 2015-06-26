@@ -30,6 +30,8 @@ a.papyri-facet-active {
 
 .papyri-search-results .constraints .field { font-weight: bold; }
 .papyri-search-results .constraints .operator { font-style: italic; }
+.papyri-search-results .constraints .or { font-style: italic; }
+
 
 .papyri-search-results .result-no {
     margin-top: 1em;

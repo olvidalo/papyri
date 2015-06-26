@@ -417,7 +417,10 @@ declare %templates:wrap function
   app:constraint-print-field($node as node(), $model as map(*)) { $search:fields($model("constraint")("searchField"))("title") };
 
 declare %templates:wrap function
-  app:constraint-print-term($node as node(), $model as map(*)) { $model("constraint")("searchTerm") };
+  app:constraint-print-term($node as node(), $model as map(*)) { 
+    for $searchTerm at $index in $model("constraint")("searchTerm")
+      return if ($index = 1) then $searchTerm else (<span class="or"> oder </span>, $searchTerm)
+  };
 
 declare %templates:wrap function
   app:constraint-print-op($node as node(), $model as map(*)) { 
