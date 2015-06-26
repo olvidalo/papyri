@@ -551,10 +551,10 @@ declare function app:create-search-field($fieldID as xs:string, $index as xs:int
                                                             else () 
                                       return <option value="{$operator}">{($attSelected, $search:ops($operator))}</option>
      let $searchOperatorInput := if (count($searchOperatorOptions) > 1) 
-                                    then <select class="operator" name="{concat('searchOperator-', $index)}">
+                                    then <select class="operator span2" name="{concat('searchOperator-', $index)}">
                                                 {$searchOperatorOptions}
                                          </select>
-                                    else <span class="operator">{$searchOperatorOptions[1]/text()}</span>
+                                    else <span class="operator span2">{$searchOperatorOptions[1]/text()}</span>
       let $searchFieldOptions := for $selectField in map:keys($search:fields)
         return 
           <option value="{$selectField}">
@@ -569,24 +569,34 @@ declare function app:create-search-field($fieldID as xs:string, $index as xs:int
       let $removeButton := if ($index = 1) then () else <a href="#" class="remove"> - </a>
 
     return 
-    <fieldset id="{$fieldID}" class="search-field">
-        <select class="combine" name="{concat('combinationOperator-', $index)}">
-           <option value="and">{(if ($prefillCombineOp = 'and') then attribute {"selected"}{"selected"} else (), if ($index = 1) then "" else "und")}</option>
-           <option value="nand">{(if ($prefillCombineOp = 'nand') then attribute {"selected"}{"selected"} else (),  if ($index = 1) then "nicht" else "und nicht")}</option>
-        </select>
-        <select class="field" name="{concat('searchField-', $index)}">
-          {$searchFieldOptions}
-        </select>
-        <!--<label for="{$field('title')}">{upper-case(substring($field('title'), 1, 1)) || substring($field('title'), 2)}</label>-->
-        {$searchOperatorInput}
-        {
-          app:create-search-term-field($field, $index, $prefillSearchField[1])
-        }
-        &#160;{$orButton}
-        &#160;{$removeButton}
+    <fieldset id="{$fieldID}" class="search-field container">
+      <div class="row-fluid">
+          <select class="combine span2" name="{concat('combinationOperator-', $index)}">
+             <option value="and">{(if ($prefillCombineOp = 'and') then attribute {"selected"}{"selected"} else (), if ($index = 1) then "" else "und")}</option>
+             <option value="nand">{(if ($prefillCombineOp = 'nand') then attribute {"selected"}{"selected"} else (),  if ($index = 1) then "nicht" else "und nicht")}</option>
+          </select>
+          <select class="field span3" name="{concat('searchField-', $index)}">
+            {$searchFieldOptions}
+          </select>
+          {$searchOperatorInput}
+      <div class="span5">
+          {
+            app:create-search-term-field($field, $index, $prefillSearchField[1])
+          }
+          &#160;{$orButton}
+          &#160;{$removeButton}
+      </div>
+      </div>
         { 
           for $searchTerm in subsequence($prefillSearchField, 2)
-            return <div class="or">{app:create-search-term-field($field, $index, $searchTerm)}</div>
+            return <div class="row-fluid or">
+                      <div class="span6">&#160;</div>
+                      <div class="span1 or">oder</div>
+                      <div class="span5">
+                      {app:create-search-term-field($field, $index, $searchTerm)}
+                      &#160;<a href="#" class="remove-or">&#160;–&#160;</a>
+                      </div>
+                    </div>
         }
     </fieldset>
 };

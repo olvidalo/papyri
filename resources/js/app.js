@@ -66,11 +66,19 @@ $(function() {
 
   $(searchFields).on('click', '.add-or', function(e) {
     e.preventDefault();
-    parentFieldset = $(this).parent();
+    parentFieldset = $(this).parents("fieldset");
     termField = $(parentFieldset).find('.term').first();
 
-    orDiv = $('<div class="or"></div>').append($(termField).clone())
-    $(parentFieldset).append(orDiv);
+    orRow = $('<div class="row-fluid or"></div>');
+    orCol = $('<div class="span5"></div>')
+      .append($(termField).clone())
+      .append('&#160;<a href="#" class="remove-or">&#160;–&#160;</a>');
+
+    orRow
+      .append('<div class="span6">&#160;</div>')
+      .append('<div class="span1 or">oder</div>')
+      .append(orCol)
+      .appendTo(parentFieldset);    
     
   });
 
@@ -78,6 +86,12 @@ $(function() {
     e.preventDefault();
     parentFieldset = $(this).parent();
     parentFieldset.remove();
+  });
+
+    $(searchFields).on('click', '.remove-or', function(e) {
+    e.preventDefault();
+    parentOrRow = $(this).parents(".or");
+    parentOrRow.remove();
   });
 
 });
