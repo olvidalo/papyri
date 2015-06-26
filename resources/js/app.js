@@ -39,7 +39,7 @@ $(function() {
 
   $(searchFields).on('change', 'select.field', function(e) {
 
-    parentFieldset = $(this).parent();
+    parentFieldset = $(this).parents("fieldset");
 
     getField(
       $(this).children('option:selected').attr('value'), 
@@ -84,7 +84,7 @@ $(function() {
 
   $(searchFields).on('click', '.remove', function(e) {
     e.preventDefault();
-    parentFieldset = $(this).parent();
+    parentFieldset = $(this).parents("fieldset");
     parentFieldset.remove();
   });
 
