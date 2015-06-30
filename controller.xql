@@ -3,6 +3,8 @@ xquery version "3.0";
 import module namespace auth="http://papyri.uni-koeln.de:8080/papyri/auth" at "modules/auth.xqm";
 import module namespace config="http://papyri.uni-koeln.de:8080/papyri/config" at "modules/config.xqm";
 import module namespace autocomplete="http://papyri.uni-koeln.de:8080/papyri/autocomplete" at "modules/autocomplete.xqm";
+import module namespace t="http://papyri.uni-koeln.de:8080/papyri/tests" at "tests/tests.xql";
+import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
 
 declare variable $exist:path external;
 declare variable $exist:resource external;
@@ -21,6 +23,8 @@ if ($exist:path eq "/" or $exist:path eq "") then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <redirect url="{$exist:app}index.html"/>
     </dispatch>
+else if ($exist:path eq "/tests") then
+    test:suite(util:list-functions("http://papyri.uni-koeln.de:8080/papyri/tests"))
 else if ($exist:path eq "/login") then
     let $path := substring-after(request:get-parameter("path", ()), "/apps/papyri")
     return
