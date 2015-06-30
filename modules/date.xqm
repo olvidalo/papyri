@@ -70,6 +70,14 @@ declare function date:dateRange($from as xs:string, $to as xs:string) {
   }
 };
 
+declare function date:inRange($range as map(), $date as xs:date) {
+  if (not(map:contains($range, "from") and map:contains($range, "to"))) 
+    then error(xs:QName('invalid-dateRange-error'), concat('Provided dateRange map does not contain a "from" and/or "to" key'))
+  else 
+
+    ($date >= $range("from") and $date <= $range("to"))          
+};
+
 declare function date:dateRange($century as xs:integer) {
   let $map := map {
     "from" := if ($century > 0) then xs:date(date:pad0(($century - 1) * 100 + 1, 4) || "-01-01")

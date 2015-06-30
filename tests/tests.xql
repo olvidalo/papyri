@@ -148,3 +148,14 @@ function t:date-parse-date-input($input as xs:string) {
 	let $dateRange := date:parse-date-input($input)
 	return $dateRange("from") || " to " || $dateRange("to")
 };
+
+declare
+	%test:args("0123-02-28", "0125-11-24", "0124-02-28")
+	%test:assertTrue
+	%test:args("-0123-02-28", "0125-11-24", "2000-02-28")
+	%test:assertFalse
+	%test:args("-0001-01-01", "-0001-01-01", "-0001-01-01")
+	%test:assertTrue
+function t:date-inRange($from as xs:date, $to as xs:date, $date as xs:date) {
+	 date:inRange(date:dateRange($from, $to), $date)
+};
