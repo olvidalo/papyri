@@ -58,6 +58,6 @@ declare function date:format-century($date) as xs:string {
    let $century := date:get-century($date)
 
    return if ($century < 0)
-    then let $abs := abs($century) return concat($abs, ". Jhdt. v. Chr")  
+    then let $abs := abs($century) return concat($abs, ". Jhdt. v. Chr.")  
     else concat($century, ". Jhdt. n. Chr.")
 };
