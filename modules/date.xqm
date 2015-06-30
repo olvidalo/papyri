@@ -38,8 +38,9 @@ declare function date:get-century($date) as xs:integer {
    let $bc := ($year < 0)
    
    let $century := let $cent := $year idiv 100
-   				   let $add := if ($bc) then -1
-   				   			   else  1
+   				   let $add := if ($bc) then
+                          if ($year mod 100)  then -1 else 0
+                          else  1
    				   return $cent + $add
 
    return $century
