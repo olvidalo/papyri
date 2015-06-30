@@ -73,7 +73,7 @@ declare function date:dateRange($from as xs:string, $to as xs:string) {
 declare function date:dateRange($century as xs:integer) {
   let $map := map {
     "from" := if ($century > 0) then xs:date(date:pad0(($century - 1) * 100 + 1, 4) || "-01-01")
-                                else xs:date(date:pad0(($century * 100), 4) || "-11-01"),
+                                else xs:date(date:pad0(($century * 100), 4) || "-01-01"),
     "to" := if ($century > 0) then xs:date(date:pad0(($century * 100), 4) || "-12-31")
                               else xs:date(date:pad0(($century + 1) * 100 - 1, 4) || "-12-31")
   }
