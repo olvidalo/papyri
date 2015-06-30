@@ -83,6 +83,70 @@ declare function date:dateRange($century as xs:integer) {
 
 };
 
+declare function date:parse-date-input($term as xs:string) {
+  
+  let $getComponents := function($string as xs:string, $pattern as xs:string) {
+                for $group in text:groups($string, $pattern)
+                where $group != ""
+                return $group
+  }
+
+  let $groups-US := $getComponents($term, "^(-?\d+)-?(\d+)?-?(\d+)?$")
+   let $count-US := count($groups-US)
+    (: YYYY :)
+    return if ($count-US = 2) then 
+      let $year := date:pad0($term, 4)
+      return date:dateRange($year || "-01-01", $year || "-12-31")
+    (: YYYY-MM :)
+    else if ($count-US = 3) then
+      let $year := date:pad0($groups-US[2], 4)
+      let $month := date:pad0($groups-US[3], 2)
+      return date:dateRange(concat($year, "-", $month, "-01"), concat($year, "-", $month, "-", date:days-in-month($year, $month)))
+    (: YYYY-MM-DD :)
+    else if ($count-US = 4) then
+      let $year := date:pad0($groups-US[2], 4)
+      let $month := date:pad0($groups-US[3], 2)
+      let $day := date:pad0($groups-US[4], 2)
+      return date:dateRange($year || "-" || $month || "-" || $day, $year || "-" || $month || "-" || $day)
+    else
+        let $groups-EU :=  $getComponents($term, "^(-?\d+)\.?(\d+)?\.?(-?\d+)?$")
+        let $count-EU := count($groups-EU)
+        (: MM.YYYY :)
+        return if ($count-EU = 3) then
+            let $year := date:pad0($groups-EU[3], 4)
+            let $month := date:pad0($groups-EU[2], 2)
+            return date:dateRange($year || "-" || $month || "-01", $year || "-" || $month || "-" || date:days-in-month(xs:integer($year), xs:integer($month)))
+        (: DD.MM.YYYY :)
+        else if ($count-EU = 4) then 
+            let $year := date:pad0($groups-EU[4], 4)
+            let $month := date:pad0($groups-EU[3], 2)
+            let $day := date:pad0($groups-EU[2], 2)
+            return date:dateRange($year || "-" || $month || "-" || $day, $year || "-" || $month || "-" || $day)
+    else
+        (: Jahrhundert als String ("3. Jahrhundert", "1. Jhdt. v. Chr.") etc. :)
+        let $groups-century-string :=  $getComponents($term, "(-?\d{1,2})\.?\s*(Jh|JH|Jhdt|Jahrhdt|Jahrhundert)\.?\s*(n|v)?")
+        (: XX. Jh. :)
+        return if (count($groups-century-string) = 3) then
+            date:dateRange(xs:integer($groups-century-string[2]))
+        (: XX. Jh. x. Chr. :)
+        else if (count($groups-century-string) = 4) then
+            (: n. Chr. :)
+            if ($groups-century-string[4] = "n") then
+                date:dateRange(xs:integer($groups-century-string[2]))
+            (: v. Chr. :)
+            else if ($groups-century-string[4] = "v") then
+                date:dateRange(xs:integer("-" || ($groups-century-string[2])))  
+            else
+              map {}
+    else (: Jahrhundert als römische Zahl :)
+        let $groups-roman-century := text:groups($term, "^-?(M{0,4})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")
+        let $resultLength := sum(for-each(subsequence($groups-roman-century, 2), fn:string-length#1))
+        return if ($resultLength > 0) then
+            date:dateRange(date:roman-numeral-to-integer($term))
+        (: TODO: Fehlerbehandlung :)
+        else map {}
+};
+
 declare function date:pad0($value, $length as xs:integer) {
   let $string := xs:string($value)
   let $minus := if (substring($string, 1, 1) = "-") then "-"
