@@ -29,11 +29,25 @@ declare function search:search($constraints as map()*, $resultType as xs:string)
 
     let $collection := xmldb:xcollection($search:data-path)
 
-    (: Funktion, die nach Textträger- bzw. Textbedingungen filtert :)
+    (: parse für jede Bedingung den Suchbegriff, entweder einfach mit normalize-space :)
+    (: oder mit einer in der Suchfelddefinition definierten Funktion :)
+    (: und filtere leere Bedingungen heraus :)
+    let $parsedConstraints := for $constraint in $constraints
+                              let $searchTerm := $constraint("searchTerm")
+                              let $field := $search:fields($constraint("searchField"))
+                              let $parseFunc := if (map:contains($field, $search:kFieldInputParser)) 
+                                                    then $field($search:kFieldInputParser)
+                                                     else normalize-space(?)
+                              where $searchTerm != ""
+                              return map:new (
+                                ($constraint, map:entry("searchTerm", $parseFunc($searchTerm)))
+                              )
+
+    (: lokale Funktion, die nach Textträger- bzw. Textbedingungen filtert :)
     let $filterConstraints := function($type as xs:string) {
-        for $constraint in $constraints 
+        for $constraint in $parsedConstraints 
             let $field := $search:fields($constraint("searchField"))
-            where $field($search:kFieldRef) = $type and $constraint("searchTerm") != ""
+            where $field($search:kFieldRef) = $type 
             return $constraint
     }
 
@@ -124,6 +138,9 @@ declare variable $search:kFieldInput := "input"; (: Das HTML-Formularelement fü
 declare variable $search:kFieldResolve := "resolve"; (: Die Suchfunktion, die eine Bedingung für das entsprechende Feld auflöst :)
 declare variable $search:kFieldValues := "values"; (: Funktion, die alle für das Feld im Korpus enthaltenen Werte zurückgibt
                                                       (für Facettenbrowsing und Drop-Down-Felder in der Suche) :)
+declare variable $search:kFieldInputParser := "parser"; (: Optionale Funktion, die den vom Benutzer eingegebenen Suchbegriff 
+                                                           transformiert (z.B. "8. Jahrhundert") in die entsprechende 
+                                                           Zeitspanne :)
 
 (: Definition der Suchfelder :)
 declare variable $search:fields := map {
