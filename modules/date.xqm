@@ -130,7 +130,7 @@ declare function date:parse-date-input($term as xs:string) {
             return date:dateRange($year || "-" || $month || "-" || $day, $year || "-" || $month || "-" || $day)
     else
         (: Jahrhundert als String ("3. Jahrhundert", "1. Jhdt. v. Chr.") etc. :)
-        let $groups-century-string :=  $getComponents($term, "(-?\d{1,2})\.?\s*(Jh|JH|Jhdt|Jahrhdt|Jahrhundert)\.?\s*(n|v)?")
+        let $groups-century-string :=  $getComponents($term, "(-?\d{1,2})\.?\s*([Jj][Hh]|[Jj]hdt|[Jj]ahrhdt|[Jj]ahrhundert)\.?\s*(n|v)?")
         (: XX. Jh. :)
         return if (count($groups-century-string) = 3) then
             date:dateRange(xs:integer($groups-century-string[2]))
