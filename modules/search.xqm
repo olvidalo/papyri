@@ -116,8 +116,8 @@ declare function search:resolve($base as node()*, $constraints as map()*) {
 declare variable $search:ops := map {
     "eq" := "entspricht",
     "cont" := "enthält",
-    "post" := "ab",
-    "pre" := "bis"
+    "post" := "frühestens",
+    "pre" := "spätestens"
 };
 
 (: Konstanten für den Ergebnistyp :)
@@ -246,27 +246,50 @@ declare variable $search:fields := map {
         $search:kFieldOperators := ("cont"),
         $search:kFieldInput := <input type="text"></input>,
         $search:kFieldResolve := function($item as node(), $op as xs:string?, $term as xs:string) {
-            $item//*[contains(lower-case(@*/text()), lower-case($term)) or contains(lower-case(text()), lower-case($term))]
+            $item//*[   contains(lower-case(string-join((@*/data(.)))), lower-case($term)) or 
+                        contains(lower-case(string-join((text()))), lower-case($term))]
         }
     },
     (: Suche nach Datierung :)
     "datierung" := map {
         $search:kFieldTitle := "Datierung",
         $search:kFieldRef := $search:cText,
-        $search:kFieldOperators := ("pre", "post"),
+        $search:kFieldOperators := ("eq", "pre", "post"),
         $search:kFieldInput := <input type="text"></input>,
-        $search:kFieldResolve := function($item as node(), $op as xs:string?, $term as xs:string) {
-            let $searchDate := date:parse-tei-date($term)
+        $search:kFieldInputParser := date:parse-date-input(?),
+        $search:kFieldResolve := function($item as node(), $op as xs:string?, $dateRange as map()) {
             let $teiDates := $item//tei:msItemStruct/tei:note[@type="orig_date"]/tei:date
             for $teiDate in $teiDates 
                 where if ($teiDate/@type = "Zeitraum")
-                        then switch($op)
-                            case 'post'     return  date:parse-tei-date($teiDate/@notAfter) ge $searchDate
-                            default (:pre:) return  $searchDate le date:parse-tei-date($teiDate/@notAfter)
-                        else (:Zeitpunkt:) switch($op)
-                            case 'post'     return date:parse-tei-date($teiDate/@when) ge $searchDate
-                            default (:pre:) return date:parse-tei-date($teiDate/@when) le $searchDate
+                        then 
+                            let $notBefore := date:parse-tei-date($teiDate/@notBefore)
+                            let $notAfter := date:parse-tei-date($teiDate/@notAfter)
+                            return if (empty($notBefore) and empty($notAfter)) then false() 
+                            else switch($op)
+                                case 'post'     return  if (not(empty($notBefore)))
+                                                            then    $dateRange("from")  le $notBefore
+                                                            else    date:inRange($dateRange, $notAfter)
 
+                                case 'pre'      return  if (not(empty($notBefore)))
+                                                            then    $dateRange("from")  ge $notBefore
+                                                            else    $dateRange("from")  le $notAfter
+
+                                default (:eq:)  return  if(empty($notBefore))
+                                                            then    $dateRange("from")  le $notAfter and
+                                                                    $dateRange("to")    le $notAfter
+                                                        else if(empty($notAfter))
+                                                            then    $dateRange("from")  ge $notBefore and
+                                                                    $dateRange("to")    ge $notBefore
+                                                        else
+                                                                    date:inRange($dateRange, $notBefore) and
+                                                                    date:inRange($dateRange, $notAfter)
+                        else (:Zeitpunkt:) 
+                            let $when := date:parse-tei-date($teiDate/@when)
+                            return if (empty($when)) then false()
+                            else switch($op)
+                                case 'post'     return  $dateRange("from") le $when
+                                case 'pre'      return  $dateRange("to")   ge $when
+                                default (:eq:)  return  date:inRange($dateRange, $when)
 
                 return $teiDate
 
