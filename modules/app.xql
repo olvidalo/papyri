@@ -384,7 +384,10 @@ declare %templates:wrap function app:post-test($node as node(), $model as map(*)
   let $resultTypeName := if ($resultType = "item") then "items"
                           else "texts" 
 
+  let $dateBefore := util:system-dateTime() 
   let $results := search:search($constraints, $resultType)
+  let $dateAfter := util:system-dateTime()
+
   let $numberOfResults := count($results)
   let $maxNum := xs:integer(request:get-parameter("max", 30))
   let $page := xs:integer(request:get-parameter("page", 1))
@@ -394,6 +397,7 @@ declare %templates:wrap function app:post-test($node as node(), $model as map(*)
     "constraints" := $constraints,
     "type" := $resultTypeName,
     "numberOfResults" := $numberOfResults,
+    "executionTime" := $dateAfter - $dateBefore,
     $resultTypeName := subsequence($results, ($page - 1) * $maxNum + 1, $maxNum)
   } else map {
     "error" := "Keine Suchparameter angegeben"
@@ -404,6 +408,12 @@ declare %templates:wrap function app:post-test($node as node(), $model as map(*)
 declare function app:search-print-result-no($node as node(), $model as map(*)) {
   if (not(map:contains($model, "error")))
     then $model("numberOfResults")
+    else 0
+};
+
+declare function app:search-print-execution-time($node as node(), $model as map(*)) {
+  if (not(map:contains($model, "error")))
+    then seconds-from-duration($model("executionTime"))
     else 0
 };
 
