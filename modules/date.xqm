@@ -13,9 +13,9 @@ module namespace date="http://papyri.uni-koeln.de:8080/papyri/date";
  : @return konstruiertes Datum oder leere Sequenz
  :)
 declare function date:parse-tei-date($dateString as xs:string?) {
-  if ($dateString castable as xs:dateTime) then xs:dateTime($dateString)
-  else if ($dateString castable as xs:date) then xs:date($dateString)
-  else if ($dateString castable as xs:gYear) then xs:date($dateString || "-01-01")
+ let $len := string-length($dateString)
+  return if ($len = 10 or $len = 11) then xs:date($dateString)
+  else if ($len = 4 or $len = 5) then xs:date($dateString || "-01-01")
   else ()
 };
 
