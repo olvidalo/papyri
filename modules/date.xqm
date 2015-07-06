@@ -95,33 +95,36 @@ declare function date:parse-date-input($term as xs:string) {
    let $count-US := count($groups-US)
     (: YYYY :)
     return if ($count-US = 2) then 
-      let $year := date:pad0($term, 4)
-      return date:dateRange($year || "-01-01", $year || "-12-31")
+      date:dateRange(date:format-parts($term, "01", "01"),
+                     date:format-parts($term, "12", "31"))
     (: YYYY-MM :)
     else if ($count-US = 3) then
-      let $year := date:pad0($groups-US[2], 4)
-      let $month := date:pad0($groups-US[3], 2)
-      return date:dateRange(concat($year, "-", $month, "-01"), concat($year, "-", $month, "-", date:days-in-month($year, $month)))
+      let $year := $groups-US[2]
+      let $month := $groups-US[3]
+      return date:dateRange(date:format-parts($year, $month, "01"),
+                            date:format-parts($year, $month, date:days-in-month($year, $month)))
     (: YYYY-MM-DD :)
     else if ($count-US = 4) then
-      let $year := date:pad0($groups-US[2], 4)
-      let $month := date:pad0($groups-US[3], 2)
-      let $day := date:pad0($groups-US[4], 2)
-      return date:dateRange($year || "-" || $month || "-" || $day, $year || "-" || $month || "-" || $day)
+      let $year := $groups-US[2]
+      let $month := $groups-US[3]
+      let $day := $groups-US[4]
+      let $dateString: = date:format-parts($year, $month, $day)
+      return date:dateRange($dateString, $dateString)
     else
         let $groups-EU :=  $getComponents($term, "^(-?\d+)\.?(\d+)?\.?(-?\d+)?$")
         let $count-EU := count($groups-EU)
         (: MM.YYYY :)
         return if ($count-EU = 3) then
-            let $year := date:pad0($groups-EU[3], 4)
-            let $month := date:pad0($groups-EU[2], 2)
-            return date:dateRange($year || "-" || $month || "-01", $year || "-" || $month || "-" || date:days-in-month(xs:integer($year), xs:integer($month)))
-        (: DD.MM.YYYY :)
+            let $year := $groups-EU[3]
+            let $month := $groups-EU[2]
+            return date:dateRange(date:format-parts($year, $month, "01"),
+                                  date:format-parts($year, $month, date:days-in-month($year, $month)))
         else if ($count-EU = 4) then 
-            let $year := date:pad0($groups-EU[4], 4)
-            let $month := date:pad0($groups-EU[3], 2)
-            let $day := date:pad0($groups-EU[2], 2)
-            return date:dateRange($year || "-" || $month || "-" || $day, $year || "-" || $month || "-" || $day)
+            let $year := $groups-EU[4]
+            let $month := $groups-EU[3]
+            let $day := $groups-EU[2]
+            let $dateString: = date:format-parts($year, $month, $day)
+            return date:dateRange($dateString, $dateString)
     else
         (: Jahrhundert als String ("3. Jahrhundert", "1. Jhdt. v. Chr.") etc. :)
         let $groups-century-string :=  $getComponents($term, "(-?\d{1,2})\.?\s*([Jj][Hh]|[Jj]hdt|[Jj]ahrhdt|[Jj]ahrhundert)\.?\s*(n|v)?")
@@ -145,6 +148,17 @@ declare function date:parse-date-input($term as xs:string) {
             date:dateRange(date:roman-numeral-to-integer($term))
         (: TODO: Fehlerbehandlung :)
         else map {}
+};
+
+declare function date:format-parts($year, $month, $day) {
+  let $yearInt := xs:integer($year)
+  let $minus := if ($yearInt < 0) then "-" else "" 
+  return concat(
+      $minus,
+      format-number(abs($yearInt), "0000"), 
+      if ($month) then "-" || format-number(xs:integer($month), "00") else "",
+      if ($day) then "-" || format-number(xs:integer($day), "00") else "" 
+    )
 };
 
 declare function date:pad0($value, $length as xs:integer) {

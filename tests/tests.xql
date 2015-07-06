@@ -58,6 +58,18 @@ function t:date-dateRange($from as xs:string, $to as xs:string) {
 	return xs:string($range("from")) || " to " || xs:string($range("to"))
 };
 
+
+declare
+	%test:args("200","","")
+	%test:assertEquals("0200")
+	%test:args("-3", "1","")
+	%test:assertEquals("-0003-01")
+	%test:args("1988", "29", "3")
+	%test:assertEquals("1988-29-03")
+function t:date-format-parts($year, $month as xs:untypedAtomic?, $day as xs:untypedAtomic) {
+	date:format-parts($year, $month, $day)
+};
+
 declare
 	%test:args("6", "4", "integer")
 	%test:assertEquals("0006")
