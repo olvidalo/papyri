@@ -63,29 +63,23 @@ declare function date:format-century($date) as xs:string {
 };
  
 declare function date:dateRange($from as xs:string, $to as xs:string) {
-  let $log := util:log-app("DEBUG", "papyri", "make date range from " || $from || " to " || $to)
-  return map {
+ map {
    "from" := xs:date($from),
    "to" := xs:date($to)
   }
 };
 
 declare function date:inRange($range as map(), $date as xs:date) {
-
-
     ($date >= $range("from") and $date <= $range("to"))          
 };
 
 declare function date:dateRange($century as xs:integer) {
-  let $map := map {
+ map {
     "from" := if ($century > 0) then xs:date(date:pad0(($century - 1) * 100 + 1, 4) || "-01-01")
                                 else xs:date(date:pad0(($century * 100), 4) || "-01-01"),
     "to" := if ($century > 0) then xs:date(date:pad0(($century * 100), 4) || "-12-31")
                               else xs:date(date:pad0(($century + 1) * 100 - 1, 4) || "-12-31")
   }
-  let $log := util:log-app("DEBUG", "papyri", "make date range from " || $map("from") || " to " || $map("to"))
-
-    return $map
 
 };
 
