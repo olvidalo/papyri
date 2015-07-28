@@ -8,39 +8,40 @@
     <div class="row-fluid">
         <form method="get" class="papyri-complex-search">
             <h3>Suche nach</h3>
-            <fieldset id="result-type">
-                <input class="app:form-control-resultType" id="t_item" type="radio" name="resultType" value="item"/>
+<!--             <fieldset id="result-type">
+                <input class="app:form-control-resultType" id="t_item" type="radio" name="resultType" value="item" />
                 <label for="t_item">Textträgern</label>
-                <input class="app:form-control-resultType" id="t_text" type="radio" name="resultType" value="text"/>
+                <input class="app:form-control-resultType" id="t_text" type="radio" name="resultType" value="text" />
                 <label for="t_text">Einzelnen Texten</label>
-            </fieldset>
+            </fieldset> -->
+            <input type="hidden" name="query" value="1"/>
             <div class="search-fields">
                 <div id="sammlung" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="inventarnummer" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="publikationsstatus" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="textsorte" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="herkunft" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="datierung" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="sprache" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="schrift" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
                 <div id="material" class="app:search-field">
-                    <div class="templates:include?path=/pages/recherche/search-field.inc.html"/>
+                    <div class="templates:include?path=/pages/recherche/dynamic-search-field.inc.html"/>
                 </div>
             </div>
             <div>
@@ -51,7 +52,7 @@
     </div>
 
     <!-- Suchergebnisse -->
-    <div class="templates:if-parameter-set?param=resultType">
+    <div class="templates:if-parameter-set?param=query">
         <div class="papyri-search-results app:post-test">
             <div class="app:get-page-nav">Seitennavigation</div>
 
@@ -73,16 +74,9 @@
             <ul class="results">
 
                 <!-- Ergebnisse für Suche nach Textträgern -->
-                <div class="templates:each?from=items&amp;to=result">
+                <div class="templates:each?from=results&amp;to=result">
                     <li class="one-result">
-                        <div class="app:search-print-item-result">Ein Textträger</div>
-                    </li>
-                </div>
-
-                <!-- Ergebnisse für Suche nach Texten -->
-                <div class="templates:each?from=texts&amp;to=result">
-                    <li class="one-result">
-                        <div class="app:search-print-text-result">Ein Text</div>
+                        <div class="app:search-print-result">Ein Textträger</div>
                     </li>
                 </div>
             </ul>

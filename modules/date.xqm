@@ -6,13 +6,16 @@ xquery version "3.0";
 module namespace date="http://papyri.uni-koeln.de:8080/papyri/date";
 
 
+declare variable $date:cDistantFuture := xs:date("10000-01-01");
+declare variable $date:cDistantPast := xs:date("-10000-01-01");
+
 (:~
  : Versucht ein gültiges xs:date/xs:dateTime aus tei-Daten im Papyri-Bestand zu konstruieren
  :  
  : @param $dateString der String im Format "YYYY", "YYYY-MM-DD" oder "YYYY-MM-DDThh:mm:ss" 
  : @return konstruiertes Datum oder leere Sequenz
  :)
-declare function date:parse-tei-date($dateString as xs:string?) {
+declare function date:parse-tei-date($dateString as xs:string?) as xs:date? {
  let $len := string-length($dateString)
   return if ($len = 10 or $len = 11) then xs:date($dateString)
   else if ($len = 4 or $len = 5) then xs:date($dateString || "-01-01")
@@ -69,8 +72,8 @@ declare function date:dateRange($from as xs:string, $to as xs:string) {
   }
 };
 
-declare function date:inRange($range as map(), $date as xs:date) {
-    ($date >= $range("from") and $date <= $range("to"))          
+declare function date:inRange($date as xs:date, $range as map()) {
+    ($date ge $range("from") and $date le $range("to"))          
 };
 
 declare function date:dateRange($century as xs:integer) {

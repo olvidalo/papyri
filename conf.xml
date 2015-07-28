@@ -11,5 +11,4 @@
     <request-path>/exist/apps/papyri</request-path>
     <!-- Webfile-Path: wie sind DB-externe Dateien, z.B. Bilddateien, übers Web zu erreichen?
     http://papyri.uni-koeln.de/z_images -->
-    <webfile-path>http://papyri.uni-koeln.de/z_images</webfile-path>
-</app-conf>
+    <webfile-path>http://papyri.uni-koeln

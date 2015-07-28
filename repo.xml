@@ -10,5 +10,4 @@
     <target>papyri</target>
     <prepare>pre-install.xql</prepare>
     <finish/>
-    <deployed>2014-11-27T14:16:03.291+01:00</deployed>
-</meta>
+    <deployed>2014-11-2

@@ -11,6 +11,8 @@ import module namespace search="http://papyri.uni-koeln.de:8080/papyri/search" a
 import module namespace date="http://papyri.uni-koeln.de:8080/papyri/date" at "date.xqm";
 import module namespace stuecke="http://papyri.uni-koeln.de:8080/papyri/stuecke" at "stuecke.xqm";
 
+import module namespace console="http://exist-db.org/xquery/console";
+
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
@@ -340,13 +342,17 @@ declare function app:print-error($node as node(), $model as map(*), $result) as 
 declare function app:parse-search-query() {
 
  let $explodedParams := for $param in request:get-parameter-names()
-                            let $components := text:groups($param, '(searchField|searchTerm|combinationOperator|searchOperator)-([0-9]+)')
+                            let $components := text:groups($param, '(searchField|searchInput|combinationOperator|searchOperator)-([0-9]+)-?([a-zA_Z]+)?-?([0-9]+)?')
                             let $index := xs:integer($components[3])
+                            let $value := request:get-parameter($param, "")
+                            where $value != ""
                             order by $index
                             return map {
                               "index" := $index,
                               "name" := $components[2], 
-                              "value" := request:get-parameter($param, "")
+                              "value" := $value,
+                              "param" := $components[4],
+                              "subindex" := $components[5]
                             }
 
   let $fields := for $param in $explodedParams
@@ -359,12 +365,27 @@ declare function app:parse-search-query() {
       return $p('value') 
   }
 
-  let $constraints := for $field at $index in $fields
+  let $constraints := for $field at $index in $fields                                          
                         return map {
                           "searchField" := $field,
                           "searchOperator" := $getConstraintComponentForIndex('searchOperator', $index),
-                          "combinationOperator" :=  $getConstraintComponentForIndex('combinationOperator', $index),
-                          "searchTerm" := $getConstraintComponentForIndex('searchTerm', $index) 
+                          "combinationOperator" :=  let $value := $getConstraintComponentForIndex('combinationOperator', $index)
+                                                    return if (empty($value)) then "and" else $value,
+                          "searchParams" := let $params := for $p in $explodedParams
+                                                  where $p('name') = "searchInput"
+                                                  and $p('index') = $index
+                                                  return $p
+                                            let $subindexes := distinct-values(
+                                                for $p in $params 
+                                                  return $p('subindex')
+                                              )
+                                            return for $subindex in $subindexes
+                                              return map:new(
+                                                  for $p in $params
+                                                    where $p('subindex') = $subindex
+                                                    return map:entry($p('param'), $p('value')) 
+                                                )
+                                          
                         }
 
   return $constraints
@@ -375,17 +396,12 @@ declare function app:parse-search-query() {
 
 declare %templates:wrap function app:post-test($node as node(), $model as map(*)) as map(*) {
   
-  let $resultType := request:get-parameter("resultType", "item")
-
   let $constraints := for $constraint in app:parse-search-query()
-                        where $constraint("searchTerm") != ""
+                        where count($constraint("searchParams")) > 0
                         return $constraint
 
-  let $resultTypeName := if ($resultType = "item") then "items"
-                          else "texts" 
-
   let $dateBefore := util:system-dateTime() 
-  let $results := search:search($constraints, $resultType)
+  let $results := search:search($constraints)
   let $dateAfter := util:system-dateTime()
 
   let $numberOfResults := count($results)
@@ -395,10 +411,9 @@ declare %templates:wrap function app:post-test($node as node(), $model as map(*)
 
   return if (count($constraints)) then map {
     "constraints" := $constraints,
-    "type" := $resultTypeName,
     "numberOfResults" := $numberOfResults,
     "executionTime" := $dateAfter - $dateBefore,
-    $resultTypeName := subsequence($results, ($page - 1) * $maxNum + 1, $maxNum)
+    "results" := subsequence($results, ($page - 1) * $maxNum + 1, $maxNum)
   } else map {
     "error" := "Keine Suchparameter angegeben"
   }
@@ -428,8 +443,7 @@ declare %templates:wrap function
 
 declare %templates:wrap function
   app:constraint-print-term($node as node(), $model as map(*)) { 
-    for $searchTerm at $index in $model("constraint")("searchTerm")
-      return if ($index = 1) then $searchTerm else (<span class="or"> oder </span>, $searchTerm)
+     search:describeConstraint($model('constraint'))
   };
 
 declare %templates:wrap function
@@ -449,7 +463,7 @@ declare %templates:wrap function
 };
 
 
-declare function app:search-print-item-result($node as node(), $model as map(*)) {
+declare function app:search-print-result($node as node(), $model as map(*)) {
 
   let $res := $model("result")
 
@@ -525,21 +539,25 @@ declare function app:search-print-text-result($node as node(), $model as map(*))
 
 
 
-declare function app:get-search-field($node as node(), $model as map(*)) {
+declare function app:get-dynamic-search-field($node as node(), $model as map(*)) {
   let $field := request:get-parameter("name", "")
   let $index := xs:integer(request:get-parameter("index", "0"))
 
-  return app:create-search-field($field, $index)
+  return app:create-dynamic-search-field($field, $index)
 };
-
+ 
 declare function app:create-search-term-field($field as map(), $index as xs:integer, $prefillValue as xs:string*) {
-  let $fieldName := concat('searchTerm-', $index)
-                                return element {$field('input')/name()} {
+  
+  <span class="terms">{
+  for $inputField in $field('input')
+    let $fieldName := string-join(('searchInput-' || $index, $inputField/@class, "1"), "-")
+
+                                let $input := element {$inputField/name()} {
                                 (attribute {'name'} {$fieldName}, 
-                                 attribute {'class'} {"term"},
+                                 attribute {'class'} {("term", $inputField/@class)},
                                   attribute {'value' } { $prefillValue },
-                                  $field('input')/@*, $field('input')/*,
-                                  if ($field('input')/name() = "select") then
+                                  $inputField/@*[not(name() = 'class')], $inputField/*,
+                                  if ($inputField/name() = "select") then
                                     app:form-control-select-options($prefillValue, (
                                       <option value="">(Alle)</option>, 
                                       for $value in $field('values')()
@@ -548,9 +566,16 @@ declare function app:create-search-term-field($field as map(), $index as xs:inte
                                     ))
                                   else ()
                                   )}
+    let $label := if ($inputField/@id) then <label for="{$inputField/@id/data(.)}">{$inputField/@id/data(.)}</label>
+                                        else ()
+
+    return ($label, $input)
+    }
+    </span>
 };
 
-declare function app:create-search-field($fieldID as xs:string, $index as xs:integer) {
+
+declare function app:create-dynamic-search-field($fieldID as xs:string, $index as xs:integer) {
 
     let $prefillSearchField := request:get-parameter(concat('searchTerm-', $index), "")
     let $prefillCombineOp := request:get-parameter(concat('combinationOperator-', $index), "")
@@ -585,7 +610,7 @@ declare function app:create-search-field($fieldID as xs:string, $index as xs:int
     <fieldset id="{$fieldID}" class="search-field container">
       <div class="row-fluid">
           <select class="combine span2" name="{concat('combinationOperator-', $index)}">
-             <option value="and">{(if ($prefillCombineOp = 'and') then attribute {"selected"}{"selected"} else (), if ($index = 1) then "" else "und")}</option>
+             <option value="and"></option>
              <option value="nand">{(if ($prefillCombineOp = 'nand') then attribute {"selected"}{"selected"} else (),  if ($index = 1) then "nicht" else "und nicht")}</option>
           </select>
           <select class="field span3" name="{concat('searchField-', $index)}">
@@ -615,7 +640,7 @@ declare function app:create-search-field($fieldID as xs:string, $index as xs:int
 };
 
 declare %templates:wrap
-function app:search-fields($node as node(), $model as map(*))  {
+function app:dynamic-search-fields($node as node(), $model as map(*))  {
 
 
     let $constraints := app:parse-search-query()
@@ -627,18 +652,83 @@ function app:search-fields($node as node(), $model as map(*))  {
                             else ("volltext", "material")
 
     for $field at $index in $initialFields
-      return app:create-search-field($field, $index)
+      return app:create-dynamic-search-field($field, $index)
 };
 
-(: Vorselektieren des Ergebnistyps der komplexen Suche anhand der Query-Parameter.
-   Notwendig, da templates:form-control bei Inputs vom Typ "radio" nicht funktioniert. :)
-declare function app:form-control-resultType($node as node(), $model as map(*)) {
-  let $resultType := request:get-parameter("resultType", "item")
-  return if ($resultType != "" and $resultType = $node/@value) 
-    then element {$node/name()} {(attribute {"checked"} {"checked"}, $node/@*, $node/*)}
-    else $node
+declare function app:search-field($node as node(), $model as map(*)) as map(*) {
+
+
+  let $fieldID := $node/@id/data(.)
+  let $index := count($node/preceding-sibling::*) + 1
+  let $log := console:log("field: " || $fieldID)
+
+
+  return map {
+    "field_id": $fieldID,
+    "index": $index,
+    "field": $search:fields($fieldID)
+  }
 };
 
+declare function app:get-search-field($node as node(), $model as map(*)) {
+  let $fieldID := request:get-parameter("id", "")
+  return map {
+    "field_id": $fieldID,
+    "index": xs:integer(request:get-parameter("index", "1")),
+    "field": $search:fields($fieldID)
+  }
+};
+
+declare function app:search-field-print-negation-select($node as node(), $model as map(*)) {
+  let $index := $model("index")
+  let $prefillNegation := request:get-parameter(concat('combinationOperator-', $index), "")
+  return <select class="combine" name="{concat('combinationOperator-', $index)}">
+             <option value="and"></option>
+             <option value="nand">{(if ($prefillNegation = 'nand') then attribute {"selected"}{"selected"} else (),  if ($index = 1) then "nicht" else "und nicht")}</option>
+          </select>
+};
+
+declare function app:search-field-print-field-select($node as node(), $model as map(*)) {
+  <select class="field" name="{concat('searchField-', $model('index'))}">
+    {
+      for $selectField in map:keys($search:fields)
+        return 
+          <option value="{$selectField}">
+          {
+            let $attSelected := if ($model("field_id") = $selectField) 
+                                 then attribute {"selected"} {"selected"}
+                                else ()
+            return ($attSelected, $search:fields($selectField)("title"))
+          }
+          </option>
+    }
+  </select>
+};
+
+declare function app:search-field-print-operator($node as node(), $model as map(*)) {
+  let $field := $model('field')
+  let $index := $model('index')
+  let $prefillSearchOp := request:get-parameter(concat('searchOperator-', $index), "")
+  let $searchOperatorOptions := for $operator in $field('operators')
+                                      let $attSelected := if ($prefillSearchOp = $operator)
+                                                            then attribute {"selected"} {"selected"}
+                                                            else () 
+                                      return <option value="{$operator}">{($attSelected, $search:ops($operator))}</option>
+  return if (count($searchOperatorOptions) > 1) 
+                                    then <select class="operator" name="{concat('searchOperator-', $index)}">
+                                                {$searchOperatorOptions}
+                                         </select>
+                                    else <span class="operator">{$searchOperatorOptions[1]/text()}</span>
+};
+
+declare function app:search-field-print-param-input($node as node(), $model as map(*)) {
+  let $prefillSearchParams := request:get-parameter(concat('searchTerm-', $model('index')), "")
+  return app:create-search-term-field($model('field'), $model('index'), $prefillSearchParams[1])
+};
+
+declare function app:search-field-print-remove-button($node as node(), $model as map(*)) {
+  if ($model('index') = 1) then () else <a href="#" class="remove"> - </a>
+};
 (: Vorselektieren Suchbegriffs in Dropdown-Listen der komplexen Suche anhand der Query-Parameter :)
 declare function app:form-control-select-options($paramQueryValue as xs:string, $options as element(option)*) {  
   for $option in $options     

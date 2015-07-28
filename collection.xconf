@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://exist-db.org/collection-config/1.0">
-    <index xmlns:xs="http://www.w3.org/2001/XMLSchema">
-        <fulltext default="none" attributes="false"/>
-    </index>
-</collection>
+    <index xmlns:tei="http://www.tei-c.org/ns/1.0">
+        <range>
+            <create qname="tei:support">
+                <field name="material" match="tei:material/tei:material" type="xs:string" case="no"/>
+            </create>
+            <create qname="tei:msIdentifier">
+                <field name="msIdentifier-idno" match="tei:idno" type="xs:string"/>
+                <field name="msIdentifier-collection" match="tei:collection" type="xs:string"/>
+            </create>
+            <create qname="tei:note">
+                <field name="note-type" match="@type" type="xs:string"/>
+                <field name="note-placeName" match="//tei:placeName" type="xs:string"/>
+            </create>
+    

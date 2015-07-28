@@ -2,7 +2,6 @@ xquery version "3.0";
 
 import module namespace auth="http://papyri.uni-koeln.de:8080/papyri/auth" at "modules/auth.xqm";
 import module namespace config="http://papyri.uni-koeln.de:8080/papyri/config" at "modules/config.xqm";
-import module namespace autocomplete="http://papyri.uni-koeln.de:8080/papyri/autocomplete" at "modules/autocomplete.xqm";
 import module namespace t="http://papyri.uni-koeln.de:8080/papyri/tests" at "tests/tests.xql";
 import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
 
@@ -60,8 +59,8 @@ else if (starts-with($exist:path, "/query")) then
         </error-handler>
     </dispatch>
 (: JSON Autocomplete :)
-else if (starts-with($exist:path, "/values")) then
-    autocomplete:lookup()
+(: else if (starts-with($exist:path, "/values")) then
+    autocomplete:lookup() :)
 (: Facettierte Übersicht :)
 else if (starts-with($exist:path, "/uebersicht")) then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">

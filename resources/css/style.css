@@ -11,15 +11,26 @@ a.papyri-facet-active {
     padding-bottom: 1em;
 }
 
-.papyri-complex-search label {
-    display: inline-block;
-    padding-right: 2em;
-}
-
 .papyri-complex-search fieldset span.or {
     text-align: right;
 }
 
+.papyri-complex-search .combine, .papyri-complex-search .field, .papyri-complex-search .operator {
+    width: 100%;
+}
+
+.papyri-complex-search .post {
+    margin-right: 1em;
+}
+
+.papyri-complex-search .post, .papyri-complex-search .pre {
+    width: 100px;
+} 
+
+.papyri-complex-search label {
+    display: inline-block;
+    padding-right: 1em;
+}
 
 /* Komplexe Suche: Suchergebnisse */
 

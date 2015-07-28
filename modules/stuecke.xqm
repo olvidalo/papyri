@@ -121,9 +121,9 @@ declare function stuecke:get-dimensions($id as xs:string){
 declare function stuecke:get-dates($res as node()){
     let $dates := for $date in $res//tei:note[@type="orig_date"]/tei:date
                 return if ($date/@type = "Zeitraum")
-                       then if ($date[not(@notBefore)]) then concat("frühestens ", $date/@notAfter/data(.))
-                            else if ($date[not(@notAfter)]) then concat("spätestens ", $date/@notBefore/data(.))
-                            else concat($date/@notBefore, " – ", $date/@notAfter)
+                       then if ($date[not(@notBefore)]) then concat("spätestens ", $date/@notAfter/data(.))
+                            else if ($date[not(@notAfter)]) then concat("frühestens ", $date/@notBefore/data(.))
+                            else concat("frühestens ", $date/@notBefore, " bis spätestens ", $date/@notAfter)
                        else $date/@when/data(.)
     
     return string-join($dates, "; ")

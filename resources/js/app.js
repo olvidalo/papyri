@@ -22,11 +22,11 @@ $(function() {
   searchForm = $('form.papyri-complex-search')
   searchFields = $(searchForm).children('.search-fields');
 
-  getField = function(name, index, callback) {
+  getField = function(id, index, callback) {
     $.ajax({
       url: papyri_app_root + '/search-field',
       data: {
-        name: name,
+        id: id,
         index: index
       },
       dataType: 'html',
@@ -67,11 +67,20 @@ $(function() {
   $(searchFields).on('click', '.add-or', function(e) {
     e.preventDefault();
     parentFieldset = $(this).parents("fieldset");
-    termField = $(parentFieldset).find('.term').first();
+    orSpan = $(parentFieldset).find('.terms').last().clone();
+    orSpan.find('input').each(function() {
+      orDef = $(this).attr('name').match(/(\S+)-(\d+)$/)
+      orName = orDef[1]
+      orIndex = parseInt(orDef[2])
+      $(this)
+        .attr('value', '')
+        .attr('name', orName + "-" + (orIndex + 1)) 
+    });
+
 
     orRow = $('<div class="row-fluid or"></div>');
     orCol = $('<div class="span5"></div>')
-      .append($(termField).clone())
+      .append($(orSpan))
       .append('&#160;<a href="#" class="remove-or">&#160;–&#160;</a>');
 
     orRow

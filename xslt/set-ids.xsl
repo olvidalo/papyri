@@ -23,6 +23,4 @@
                 <xsl:value-of select="concat(@xml:id, $invnr)"/>
             </xsl:attribute>
             <xsl:apply-templates/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:stylesheet>
+        </xsl:copy

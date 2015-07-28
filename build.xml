@@ -18,13 +18,13 @@
             <fileset dir=".">
                 <include name="**/*.*"/>
                 <exclude name="build/"/>
-                <exclude name="modules/admin.xqm"/>
                 <exclude name="**/*.properties"/>
                 <exclude name="**/*.tmpl"/>
                 <exclude name="**/*.md"/>
                 <exclude name="**/.gitignore"/>
                 <exclude name="*.xpr"/>
-                <exclude name="data/**/*" />
+                <exclude name="modules/admin.xqm"/>
+                <exclude name="data/**/*"/>
             </fileset>
         </xdb:store>
     </target>
@@ -46,9 +46,7 @@
                 <exclude name="**/*.md"/>
                 <exclude name="**/.gitignore"/>
                 <exclude name="*.xpr"/>
-                <exclude name="data/**/*" />
+                <exclude name="data/**/*"/>
             </fileset>
         </xdb:store>
-        <xdb:xquery uri="${uri}" queryfile="post-install.xql" user="${user}" password="${password}"/>
-    </target>
-</project>
+        <xdb:xquery uri="${uri}" queryfile="post-install.xql" user="${user}" password="
